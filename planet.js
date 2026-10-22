@@ -1,10 +1,12 @@
 // The takeoff horizon: a real 3D planet limb in the deck's sand gold, with a
 // navigational graticule and an orbit of small beacons (the deck's ring dots).
-// Scroll sinks and turns it; the pointer leans the camera. The CSS semicircle
-// behind it is the poster: it stays if WebGL is missing or motion is reduced.
+// Its limb is solved to sit on the CSS horizon (--horizon, --lx on the stage),
+// so L always stands on it, never behind it. Scroll turns it; the pointer
+// leans the camera. The CSS disc is the poster when WebGL or motion is off.
 import * as THREE from 'three';
 
 const section = document.querySelector('.takeoff');
+const stage = section.querySelector('.takeoff__stage');
 const canvas = document.querySelector('[data-planet]');
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -20,7 +22,7 @@ if (!reduce && webgl()) {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
 
-  const R = 6;
+  const R = 8;
   const planet = new THREE.Group();
   scene.add(planet);
 
@@ -68,11 +70,32 @@ if (!reduce && webgl()) {
   const rim = new THREE.DirectionalLight(0x9fb4d0, 0.9);
   rim.position.set(5, 1, -6); scene.add(rim);
 
-  let w = 0, h = 0;
+  const CAM_Y = 0.2, CAM_Z = 9, PLANET_Z = -2;
+  const halfV = THREE.MathUtils.degToRad(camera.fov / 2);
+  let w = 0, h = 0, baseX = 0, baseY = -R;
+  // Place the sphere so its silhouette top lands on the CSS horizon, under L.
+  function solve() {
+    const cs = getComputedStyle(stage);
+    const horizon = parseFloat(cs.getPropertyValue('--horizon')) || 0.8;
+    const lx = parseFloat(cs.getPropertyValue('--lx')) || 0.5;
+    const target = 1 - 2 * horizon; // NDC y of the limb
+    const depth = CAM_Z - PLANET_Z;
+    const ndcOf = (y) => {
+      const dy = y - CAM_Y, d = Math.hypot(dy, depth);
+      return Math.tan(Math.atan2(dy, depth) + Math.asin(R / d)) / Math.tan(halfV);
+    };
+    let lo = -R * 6, hi = 0;
+    for (let i = 0; i < 40; i++) { const mid = (lo + hi) / 2; if (ndcOf(mid) > target) hi = mid; else lo = mid; }
+    baseY = (lo + hi) / 2;
+    // The tangent point sits nearer the camera than the centre; aim x at that depth.
+    const tDepth = depth - R * R / depth;
+    baseX = (2 * lx - 1) * Math.tan(halfV) * camera.aspect * tDepth;
+  }
   function resize() {
     w = canvas.clientWidth; h = canvas.clientHeight;
     renderer.setSize(w, h, false);
     camera.aspect = w / h; camera.updateProjectionMatrix();
+    solve();
   }
   addEventListener('resize', resize); resize();
 
@@ -91,15 +114,13 @@ if (!reduce && webgl()) {
     const p = parseFloat(section.style.getPropertyValue('--sc-p')) || 0;
     const t = clock.getElapsedTime();
     px += (tpx - px) * 0.05;
-    const phone = w < 860;
-    // Horizon sits about 62% down the frame at p = 0 and sinks as she rises.
-    planet.position.set(0, -R - (phone ? 0.75 : 1.15) - p * 1.1, phone ? -3.4 : -1.2);
+    planet.position.set(baseX, baseY, PLANET_Z);
     planet.rotation.y = t * 0.03 + p * 0.6;
     planet.rotation.x = 0.18;
     planet.rotation.z = 0.55; // keeps the graticule's pole out of the centre of the frame
     orbit.rotation.y = t * 0.05;
-    camera.position.set(px * 0.35, 0.2, 9);
-    camera.lookAt(0, -0.4, 0);
+    // The camera only slides (no tilt), so the solved horizon stays put.
+    camera.position.set(px * 0.12, CAM_Y, CAM_Z);
     renderer.render(scene, camera);
     if (first) { first = false; section.classList.add('is-3d'); }
   }

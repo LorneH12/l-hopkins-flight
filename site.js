@@ -1,4 +1,4 @@
-// Page-local behaviour for the Flight log build. The engine stays untouched;
+// Page-local behaviour for the L Hopkins flight build. The engine stays untouched;
 // bespoke parts read the engine's --sc-p off each act.
 (function () {
   'use strict';
@@ -37,7 +37,7 @@
     }, { threshold: 0.2 }).observe(board);
   } else board.classList.add('is-in');
 
-  // ---- four flights: her official long jumps, flown to scale ----------------
+  // ---- long jump: her four official marks, drawn to scale -----------------
   // x: the board sits at 80; 1 m = 175 units, so 6 m lands at 1130.
   var FLIGHTS = [
     { d: 5.22, meet: 'Pioneer Meet, April 2025. Meet record.' },
@@ -46,7 +46,7 @@
     { d: 5.47, meet: 'Phoenix Invitational, April 2026. Arizona No. 1.' }
   ];
   var BOARD_X = 80, PER_M = 175, GROUND = 360, SVGNS = 'http://www.w3.org/2000/svg';
-  var flightsAct = document.getElementById('flights');
+  var flightsAct = document.getElementById('longjump');
   var arcsG = document.querySelector('[data-arcs]');
   var ticksG = document.querySelector('[data-ticks]');
   var pit = document.querySelector('[data-pit]');
@@ -103,7 +103,7 @@
       f.k = k;
     });
     var key, meet, dist;
-    if (live < 0) { meet = 'On the board'; dist = '0.00 m'; }
+    if (live < 0) { meet = 'Takeoff board'; dist = '0.00 m'; }
     else {
       var f = FLIGHTS[live];
       meet = f.meet; dist = (f.d * f.k).toFixed(2) + ' m';
@@ -111,6 +111,40 @@
     key = meet + dist;
     if (key !== lastKey) { meetEl.textContent = meet; distEl.textContent = dist; lastKey = key; }
   }
+
+  // ---- highlights: one screen, five chapters --------------------------------
+  // Plays muted when it scrolls into view (unless motion is reduced), runs the
+  // chapters in order, and pauses when it leaves. Every clip keeps its controls.
+  var reel = document.querySelector('[data-reel]');
+  var video = reel.querySelector('[data-reel-video]');
+  var chapters = [].slice.call(reel.querySelectorAll('.reel__list button'));
+  var titleEl = reel.querySelector('[data-reel-title]');
+  var metaEl = reel.querySelector('[data-reel-meta]');
+  var current = 0, inView = false, switching = false;
+  function choose(i, play) {
+    current = i;
+    var b = chapters[i];
+    chapters.forEach(function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); });
+    switching = true;
+    video.src = b.dataset.src; video.poster = b.dataset.poster;
+    setTimeout(function () { switching = false; }, 0);
+    video.setAttribute('aria-label', b.dataset.label);
+    titleEl.textContent = b.dataset.title; metaEl.textContent = b.dataset.meta;
+    if (play) { var pr = video.play(); if (pr && pr.catch) pr.catch(function () {}); }
+  }
+  chapters.forEach(function (b, i) { b.addEventListener('click', function () { choose(i, true); }); });
+  video.addEventListener('ended', function () { if (inView) choose((current + 1) % chapters.length, true); });
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        inView = en.isIntersecting;
+        if (inView && !reduce && video.paused && !video.dataset.touched) { var pr = video.play(); if (pr && pr.catch) pr.catch(function () {}); }
+        if (!inView && !video.paused) video.pause();
+      });
+    }, { threshold: 0.5 }).observe(video);
+  }
+  // Once the visitor pauses it themselves, stop auto-playing it.
+  video.addEventListener('pause', function () { if (inView && !switching && !video.ended) video.dataset.touched = '1'; });
 
   // ---- one loop ------------------------------------------------------------
   function frame() {
