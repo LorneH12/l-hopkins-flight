@@ -407,3 +407,78 @@ html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
 @media (max-width: 860px) { .board__table tr.is-title { background: var(--blue); border-color: rgb(231 183 68 / .6); } }
 /* The other two jumps stay readable once landed. */
 .flights__svg .arc.is-done { opacity: .7; }
+
+/* ---------------------------------------------- hero: L front and center */
+/* L stands centred in front of the planet; the cut at her legs sits exactly on
+   the bottom edge of the hero, which is the bottom of the screen while pinned.
+   The copy splits around her: who she is on the left, her proof on the right. */
+.takeoff__stage { --horizon: .74; --lx: .5; }
+.takeoff__l {
+  left: 50%; bottom: 0; z-index: 3;
+  height: min(88vh, 100% - 6vh); width: auto;
+  transform: translate3d(calc(-50% + var(--mx, 0) * 8px), 0, 0) scale(calc(1 + var(--sc-p, 0) * .03));
+  transform-origin: 50% 100%;
+}
+.takeoff__planet, .takeoff__poster { z-index: 2; }
+.takeoff__copy {
+  z-index: 4; left: max(1.5rem, 5vw); right: calc(max(1.5rem, 5vw) + 2.5rem); width: auto; top: 46%;
+  transform: translate3d(0, calc(-50% - var(--sc-p, 0) * 5vh), 0);
+  display: grid; grid-template-columns: minmax(0, 1fr) min(34vw, 30rem) minmax(0, 1fr); align-items: center; gap: 0 1.5rem;
+}
+.takeoff__id { grid-column: 1; display: grid; gap: 1rem; justify-items: start; }
+.takeoff__proof { grid-column: 3; display: grid; gap: .6rem; justify-items: end; text-align: right; }
+.takeoff__proof .takeoff__stats { justify-content: flex-end; }
+.takeoff__proof .takeoff__actions { justify-content: flex-end; }
+.takeoff__title { font-size: clamp(3rem, 1rem + 4.6vw, 6.2rem); }
+.takeoff__line { max-width: 30ch; }
+@media (max-width: 1100px) and (min-width: 861px) {
+  .takeoff__copy { grid-template-columns: minmax(0, 1fr) min(30vw, 22rem) minmax(0, 1fr); }
+  .takeoff__stats { gap: 1rem; }
+  .takeoff__actions { flex-direction: column; align-items: flex-end; }
+}
+@media (max-width: 860px) {
+  .takeoff__stage { --horizon: .8; }
+  .takeoff__copy { left: 50%; right: auto; top: 6vh; width: min(30rem, calc(100vw - 2.5rem)); transform: translate3d(-50%, calc(var(--sc-p, 0) * -4vh), 0); grid-template-columns: 1fr; gap: .7rem; }
+  .takeoff__id, .takeoff__proof { grid-column: 1; justify-items: center; text-align: center; }
+  .takeoff__proof .takeoff__stats, .takeoff__proof .takeoff__actions { justify-content: center; }
+  .takeoff__id { gap: .6rem; }
+  .takeoff__l { height: 44vh; }
+}
+@media (min-width: 600px) and (max-width: 860px) { .takeoff__l { height: 50vh; } }
+@media (prefers-reduced-motion: reduce) {
+  .takeoff__l { transform: translateX(-50%); }
+  .takeoff__copy { transform: translateY(-50%); }
+}
+@media (prefers-reduced-motion: reduce) and (max-width: 860px) {
+  .takeoff__copy { transform: translateX(-50%); }
+}
+/* The name never breaks; the top line wraps only between its items. */
+.takeoff__title { white-space: nowrap; font-size: clamp(2.6rem, 6vw, 5.6rem); }
+.takeoff__kicker span { white-space: nowrap; }
+.takeoff__id .takeoff__kicker { letter-spacing: .2em; }
+.takeoff__stats dt, .takeoff__stats dd { white-space: nowrap; }
+.takeoff__copy { grid-template-columns: minmax(0, 1fr) min(32vw, 28rem) minmax(0, 1fr); }
+@media (max-width: 1100px) and (min-width: 861px) {
+  .takeoff__l { height: min(80vh, 100% - 6vh); }
+  .takeoff__copy { grid-template-columns: minmax(0, 1fr) min(30vw, 20rem) minmax(0, 1fr); }
+  .takeoff__stats dd { font-size: 1.55rem; }
+  .takeoff__stats dt { letter-spacing: .1em; }
+}
+@media (max-width: 860px) { .takeoff__title { font-size: clamp(2.6rem, 11vw, 4.6rem); } }
+/* Her figure is about 0.6 of her height wide, so the centre column follows the
+   viewport height; copy sizes to whatever is left on each side. */
+@media (min-width: 861px) {
+  .takeoff__copy { grid-template-columns: minmax(0, 1fr) 56vh minmax(0, 1fr); }
+  .takeoff__title { font-size: clamp(2.6rem, min(5.6vw, 9.5vh), 5.6rem); }
+  .takeoff__proof .takeoff__actions { flex-direction: column; align-items: flex-end; }
+}
+@media (min-width: 861px) {
+  .takeoff__l { height: min(88vh, 100% - 6vh, 64vw); }
+  .takeoff__copy { grid-template-columns: minmax(0, 1fr) min(56vh, 40vw) minmax(0, 1fr); }
+  .takeoff__title { font-size: clamp(2.6rem, min(4.9vw, 9.5vh), 5.6rem); }
+  /* Personal bests as a right-aligned list: event, then mark. */
+  .takeoff__proof .takeoff__stats { flex-direction: column; align-items: flex-end; gap: .35rem; margin: .2rem 0 .8rem; }
+  .takeoff__proof .takeoff__stats > div { display: flex; align-items: baseline; gap: .9rem; }
+  .takeoff__proof .takeoff__stats dd { margin: 0; font-size: clamp(1.6rem, 1.1rem + 1.1vw, 2.3rem); }
+}
+@media (max-width: 1100px) and (min-width: 861px) { .takeoff__l { height: min(80vh, 100% - 6vh, 64vw); } }
