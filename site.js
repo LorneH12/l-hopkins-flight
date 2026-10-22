@@ -11,22 +11,40 @@
   var legs = [].slice.call(route.querySelectorAll('a')).map(function (a) {
     return { a: a, el: document.querySelector(a.getAttribute('href')) };
   });
-  function updateRoute() {
-    var max = document.documentElement.scrollHeight - innerHeight;
-    route.style.setProperty('--route-p', (max > 0 ? scrollY / max : 0).toFixed(4));
-    var current = legs[0];
-    legs.forEach(function (l) { if (l.el.getBoundingClientRect().top <= innerHeight * 0.4) current = l; });
-    legs.forEach(function (l) {
-      if (l === current) l.a.setAttribute('aria-current', 'true'); else l.a.removeAttribute('aria-current');
-    });
+  // Measure once (and on resize), then work from cached numbers: scrolling
+  // reads only scrollY, never layout, and writes at most once per frame.
+  var tops = [], max = 1, routeQueued = false, lastLeg = null;
+  function measure() {
+    tops = legs.map(function (l) { return l.el.getBoundingClientRect().top + scrollY; });
+    max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+    updateRoute();
   }
+  function updateRoute() {
+    routeQueued = false;
+    route.style.setProperty('--route-p', Math.min(1, scrollY / max).toFixed(4));
+    // Current section: the last one whose top has passed 40% of the viewport;
+    // at the very bottom of the page, the last section.
+    var line = scrollY + innerHeight * 0.4, i = 0;
+    for (var k = 0; k < tops.length; k++) if (tops[k] <= line) i = k;
+    if (scrollY >= max - 2) i = legs.length - 1;
+    if (legs[i] !== lastLeg) {
+      lastLeg = legs[i];
+      legs.forEach(function (l) { if (l === lastLeg) l.a.setAttribute('aria-current', 'true'); else l.a.removeAttribute('aria-current'); });
+    }
+  }
+  addEventListener('scroll', function () { if (!routeQueued) { routeQueued = true; requestAnimationFrame(updateRoute); } }, { passive: true });
+  addEventListener('resize', measure);
+  addEventListener('load', measure);
+  measure();
 
   // ---- takeoff: pointer depth, additive only -------------------------------
+  // --mx is written on the two layers that use it, not inherited from the stage.
   var takeoff = document.querySelector('.takeoff__stage');
+  var depthLayers = [takeoff.querySelector('.takeoff__sky'), takeoff.querySelector('.takeoff__l')];
   var mx = 0, tx = 0;
   if (fine && !reduce) {
-    takeoff.addEventListener('pointermove', function (e) { tx = (e.clientX / innerWidth) * 2 - 1; });
-    takeoff.addEventListener('pointerleave', function () { tx = 0; });
+    takeoff.addEventListener('pointermove', function (e) { tx = (e.clientX / innerWidth) * 2 - 1; wake(); });
+    takeoff.addEventListener('pointerleave', function () { tx = 0; wake(); });
   }
 
   // ---- departures: the board flips once when it arrives --------------------
@@ -43,7 +61,7 @@
     { d: 5.22, meet: 'Pioneer Meet, April 2025. Meet record.' },
     { d: 5.17, meet: 'USATF National Junior Olympics, July 2025. Champion.', title: true },
     { d: 5.28, meet: 'New Balance Nationals Indoor, March 2026. Bronze.' },
-    { d: 5.47, meet: 'Phoenix Invitational, April 2026. Arizona No. 1.' }
+    { d: 5.47, meet: 'Phoenix Invitational, April 2026. Arizona No. 1.', best: true }
   ];
   var BOARD_X = 80, PER_M = 175, GROUND = 360, SVGNS = 'http://www.w3.org/2000/svg';
   var flightsAct = document.getElementById('longjump');
@@ -70,21 +88,22 @@
     var end = BOARD_X + f.d * PER_M, apex = 150 + i * 14; // illustrative heights, drawn for scale only
     var path = document.createElementNS(SVGNS, 'path');
     path.setAttribute('d', 'M' + BOARD_X + ' ' + GROUND + ' Q ' + ((BOARD_X + end) / 2) + ' ' + (GROUND - apex * 2) + ' ' + end + ' ' + GROUND);
-    path.setAttribute('class', 'arc' + (f.title ? ' is-title' : ''));
+    path.setAttribute('class', 'arc' + (f.title ? ' is-title' : '') + (f.best ? ' is-best' : ''));
     var dot = document.createElementNS(SVGNS, 'circle');
     dot.setAttribute('r', 6); dot.setAttribute('class', 'dot'); dot.style.opacity = 0;
     arcsG.appendChild(path); arcsG.appendChild(dot);
     f.path = path; f.dot = dot; f.len = path.getTotalLength();
     path.style.strokeDasharray = f.len; path.style.strokeDashoffset = f.len;
     var mark = document.createElement('div');
-    mark.className = 'mark' + (i % 2 ? ' is-low' : '');
+    var mx_ = (f.d - PIT_MIN) / (PIT_MAX - PIT_MIN);
+    mark.className = 'mark' + (i % 2 ? ' is-low' : '') + (mx_ > 0.8 ? ' is-end' : '');
     mark.style.setProperty('--x', ((f.d - PIT_MIN) / (PIT_MAX - PIT_MIN)).toFixed(4));
-    mark.innerHTML = '<span>' + f.d.toFixed(2) + ' m' + (f.title ? ' · title' : '') + '</span>';
+    mark.innerHTML = '<span>' + f.d.toFixed(2) + '<i> m</i>' + (f.title ? '<b> · champion</b>' : f.best ? '<b> · best</b>' : '') + '</span>';
     pit.appendChild(mark); f.mark = mark;
   });
 
   // Silence for the first 14% of the act, then four windows, then a hold.
-  var START = 0.14, WIN = 0.17;
+  var START = 0.04, WIN = 0.19;
   var lastKey = '';
   function updateFlights() {
     var p = reduce ? 1 : actP(flightsAct);
@@ -92,7 +111,8 @@
     FLIGHTS.forEach(function (f, i) {
       var k = Math.max(0, Math.min(1, (p - START - i * WIN) / (WIN * 0.86)));
       f.path.style.strokeDashoffset = (f.len * (1 - k)).toFixed(1);
-      f.path.style.strokeDasharray = k >= 1 ? '6 7' : f.len;
+      f.path.style.strokeDasharray = k >= 1 ? ((f.best || f.title) ? 'none' : '6 7') : f.len;
+      f.path.classList.toggle('is-done', k >= 1);
       f.path.classList.toggle('is-live', k > 0 && k < 1);
       if (k > 0 && k < 1) {
         var pt = f.path.getPointAtLength(f.len * k);
@@ -103,7 +123,7 @@
       f.k = k;
     });
     var key, meet, dist;
-    if (live < 0) { meet = 'Takeoff board'; dist = '0.00 m'; }
+    if (live < 0) { meet = 'From the takeoff board'; dist = '0.00 m'; }
     else {
       var f = FLIGHTS[live];
       meet = f.meet; dist = (f.d * f.k).toFixed(2) + ' m';
@@ -121,6 +141,8 @@
   var titleEl = reel.querySelector('[data-reel-title]');
   var metaEl = reel.querySelector('[data-reel-meta]');
   var current = 0, inView = false, switching = false;
+  var saveData = !!(navigator.connection && navigator.connection.saveData);
+  if (saveData) video.preload = 'none';
   function choose(i, play) {
     current = i;
     var b = chapters[i];
@@ -133,12 +155,12 @@
     if (play) { var pr = video.play(); if (pr && pr.catch) pr.catch(function () {}); }
   }
   chapters.forEach(function (b, i) { b.addEventListener('click', function () { choose(i, true); }); });
-  video.addEventListener('ended', function () { if (inView) choose((current + 1) % chapters.length, true); });
+  video.addEventListener('ended', function () { if (inView && !saveData) choose((current + 1) % chapters.length, true); });
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
         inView = en.isIntersecting;
-        if (inView && !reduce && video.paused && !video.dataset.touched) { var pr = video.play(); if (pr && pr.catch) pr.catch(function () {}); }
+        if (inView && !reduce && !saveData && video.paused && !video.dataset.touched) { var pr = video.play(); if (pr && pr.catch) pr.catch(function () {}); }
         if (!inView && !video.paused) video.pause();
       });
     }, { threshold: 0.5 }).observe(video);
@@ -146,27 +168,50 @@
   // Once the visitor pauses it themselves, stop auto-playing it.
   video.addEventListener('pause', function () { if (inView && !switching && !video.ended) video.dataset.touched = '1'; });
 
-  // ---- one loop ------------------------------------------------------------
+  // ---- one loop, which sleeps when nothing on screen needs it ---------------
+  var flightsNear = false, running = false;
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      flightsNear = entries[0].isIntersecting; if (flightsNear) wake();
+    }, { rootMargin: '25% 0px' }).observe(flightsAct);
+  } else flightsNear = true;
   function frame() {
-    updateRoute();
-    updateFlights();
-    if (!reduce) { mx += (tx - mx) * 0.08; takeoff.style.setProperty('--mx', mx.toFixed(3)); }
-    requestAnimationFrame(frame);
+    var busy = false;
+    if (flightsNear) { updateFlights(); busy = true; }
+    if (!reduce && Math.abs(tx - mx) > 0.001) {
+      mx += (tx - mx) * 0.08; busy = true;
+      depthLayers.forEach(function (el) { el.style.setProperty('--mx', mx.toFixed(3)); });
+    }
+    running = busy;
+    if (busy) requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
+  function wake() { if (!running) { running = true; requestAnimationFrame(frame); } }
+  updateFlights();
+  wake();
 
   // ---- contact: the parent's address never ships. Messages go to a relay. --
   var form = document.querySelector('[data-contact]');
   var status = form.querySelector('[data-contact-status]');
   var send = form.querySelector('button[type=submit]');
+  // Errors point at the field that caused them, and clear once it is edited.
+  function flag(field, message) {
+    status.textContent = message;
+    field.setAttribute('aria-invalid', 'true');
+    field.setAttribute('aria-describedby', status.id);
+    field.focus();
+  }
+  form.addEventListener('input', function (e) {
+    if (e.target.getAttribute('aria-invalid')) { e.target.removeAttribute('aria-invalid'); e.target.removeAttribute('aria-describedby'); }
+  });
+  if (!form.getAttribute('data-access-key')) document.querySelector('[data-contact-offline]').hidden = false;
   form.addEventListener('submit', function (event) {
     event.preventDefault();
     var missing = [].slice.call(form.querySelectorAll('[required]')).find(function (f) { return !f.value.trim(); });
-    if (missing) { status.textContent = 'Please add ' + missing.placeholder.toLowerCase() + '.'; missing.focus(); return; }
+    if (missing) { flag(missing, 'Please add ' + missing.placeholder.toLowerCase() + '.'); return; }
     var email = form.querySelector('[type=email]');
-    if (!email.validity.valid) { status.textContent = 'That email address looks incomplete. Check it and send again.'; email.focus(); return; }
+    if (!email.validity.valid || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim())) { flag(email, 'That email address looks incomplete. Check it and send again.'); return; }
     var key = form.getAttribute('data-access-key');
-    if (!key) { status.textContent = 'The contact form is being connected and is not sending yet. Please try again soon.'; return; }
+    if (!key) { status.textContent = 'The form is not sending yet. Your message is still here; for now, reach the family on Instagram at @l.h0pkins.'; return; }
     var data = new FormData(form);
     data.append('access_key', key);
     data.append('subject', 'L Hopkins site: message from ' + data.get('name'));

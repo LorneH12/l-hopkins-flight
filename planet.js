@@ -99,8 +99,12 @@ if (!reduce && webgl()) {
   }
   addEventListener('resize', resize); resize();
 
-  let visible = true;
-  new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { rootMargin: '10%' }).observe(section);
+  // Render only while the hero is on screen; the loop stops entirely otherwise.
+  let visible = true, looping = false;
+  new IntersectionObserver(([e]) => {
+    visible = e.isIntersecting;
+    if (visible && !looping) { looping = true; requestAnimationFrame(tick); }
+  }, { rootMargin: '10%' }).observe(section);
 
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
   let px = 0, tpx = 0;
@@ -109,8 +113,8 @@ if (!reduce && webgl()) {
   const clock = new THREE.Clock();
   let first = true;
   function tick() {
+    if (!visible) { looping = false; return; }
     requestAnimationFrame(tick);
-    if (!visible) return;
     const p = parseFloat(section.style.getPropertyValue('--sc-p')) || 0;
     const t = clock.getElapsedTime();
     px += (tpx - px) * 0.05;
@@ -124,5 +128,6 @@ if (!reduce && webgl()) {
     renderer.render(scene, camera);
     if (first) { first = false; section.classList.add('is-3d'); }
   }
+  looping = true;
   tick();
 }
