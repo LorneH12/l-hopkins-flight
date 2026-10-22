@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>L Hopkins · Flight log · Class of 2030</title>
+<meta name="description" content="L Hopkins, 2025 USATF Junior Olympic long-jump champion, Xavier College Preparatory, Class of 2030. Her four official long jumps, flown to scale.">
+<meta name="theme-color" content="#19232D">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='16' fill='%2319232D'/><path d='M6 22a10 10 0 0 1 20 0z' fill='%23DCBB86'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Mulish:wght@400;600;700&display=swap">
+<link rel="preload" as="image" href="assets/uniform-football-700.webp" fetchpriority="high">
+<link rel="stylesheet" href="scrollcraft.css">
+<link rel="stylesheet" href="site.css">
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.min.js" } }</script>
+</head>
+<body>
+
+<a class="skip" href="#log">Skip to her flight log</a>
+
+<!-- Route rail: the page's navigation. The plane rides it by page progress. -->
+<nav class="route" aria-label="Route">
+  <svg class="route__line" aria-hidden="true" preserveAspectRatio="none" viewBox="0 0 2 100"><line x1="1" y1="0" x2="1" y2="100"/></svg>
+  <svg class="route__plane" aria-hidden="true" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>
+  <ol>
+    <li style="--at: 0"><a href="#top"><span>Takeoff</span></a></li>
+    <li style="--at: 0.2"><a href="#log"><span>Flight log</span></a></li>
+    <li style="--at: 0.4"><a href="#board"><span>Departures</span></a></li>
+    <li style="--at: 0.6"><a href="#flights"><span>Four flights</span></a></li>
+    <li style="--at: 0.8"><a href="#uniforms"><span>Crew</span></a></li>
+    <li style="--at: 1"><a href="#pass"><span>Boarding pass</span></a></li>
+  </ol>
+</nav>
+
+<main>
+
+  <!-- 1 · TAKEOFF: pin. A 3D planet limb rises; L rises over the horizon. -->
+  <section id="top" class="takeoff" data-sc-act="pin" data-sc-span="1.6">
+    <div data-sc-stage class="takeoff__stage">
+      <div class="takeoff__sky" aria-hidden="true"></div>
+      <div class="takeoff__copy">
+        <p class="takeoff__kicker">Sprints · Long jump · Flag football</p>
+        <h1 class="takeoff__title">L Hopkins</h1>
+        <p class="takeoff__line">National champion in the long jump at thirteen. Xavier College Preparatory, Class of 2030.</p>
+        <a class="button" href="#pass">Contact the family</a>
+      </div>
+      <img class="takeoff__l" src="assets/uniform-football-700.webp" width="700" height="1187"
+           alt="L Hopkins in her Xavier #7 jersey, holding a football out in her right hand.">
+      <div class="takeoff__poster" aria-hidden="true"></div>
+      <canvas class="takeoff__planet" data-planet aria-hidden="true"></canvas>
+    </div>
+  </section>
+
+  <!-- 2 · FLIGHT LOG: reveal on offset cards, the deck's signature composition. -->
+  <section id="log" class="log ground-ivory">
+    <div class="sc-wrap log__grid">
+      <div class="log__media">
+        <div class="log__block" aria-hidden="true"></div>
+        <figure class="log__photo" data-sc-reveal="up" data-sc-reveal-at="0.12 0.5">
+          <img src="assets/synopsis-1200.webp" srcset="assets/synopsis-700.webp 700w, assets/synopsis-1200.webp 1200w" sizes="(max-width: 860px) 80vw, 34vw"
+               width="1200" height="1800" loading="lazy" alt="L in her blue Xavier jersey, pointing both thumbs at the number 7.">
+        </figure>
+        <div class="log__stat">
+          <p class="log__stat-n">5.17 m</p>
+          <p>Girls 13–14 long jump. USATF National Junior Olympics, July 25, 2025. First place.</p>
+        </div>
+      </div>
+      <div class="log__text sc-stack" data-sc-in data-sc-stagger="60">
+        <h2 class="display">The longest flight in the field</h2>
+        <p>At the 2025 USATF National Junior Olympics, nobody in the girls 13–14 long-jump final went farther than L Hopkins. She was thirteen, and she had not started high school.</p>
+        <p>Since then: two bronze medals at New Balance Nationals Indoor, the No. 1 long-jump mark in Arizona, and fourth in the country in the Nike Outdoor Nationals 100 m final. She runs for Tha Truth Track Tribe, and rushes the passer for the Xavier Gators in number 7.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · DEPARTURES: a split-flap board of every result, each linked. -->
+  <section id="board" class="board ground-navy">
+    <div class="sc-wrap">
+      <div class="board__head">
+        <h2 class="display display--light">Departures</h2>
+        <p>Every meet links to its official result or ranking.</p>
+      </div>
+      <div class="board__scroll">
+        <table class="board__table" data-board>
+          <thead><tr><th scope="col">Date</th><th scope="col">Destination</th><th scope="col">Event</th><th scope="col">Mark</th><th scope="col">Status</th></tr></thead>
+          <tbody>
+            <tr style="--i:0"><td>06·27·26</td><td><a href="https://www.athletic.net/TrackAndField/rankings/list/168009/f/100m?ages=13,14">Arizona No. 1</a> · <a href="https://az.milesplit.com/articles/708623">USATF Region 10 No. 1</a></td><td>100 m</td><td>12.08</td><td class="is-gold">Ranked 1st</td></tr>
+            <tr style="--i:1"><td>06·22·26</td><td><a href="https://live.athletictiming.net/meets/74712/events/individual/2836029">Nike Outdoor Nationals final</a></td><td>100 m</td><td>12.08</td><td>4th</td></tr>
+            <tr style="--i:2"><td>06·13·26</td><td><a href="https://live.athletic.net/meets/74867/events/individual/2818609">USATF Arizona Junior Olympics</a></td><td>200 m</td><td>25.58</td><td class="is-gold">1st</td></tr>
+            <tr style="--i:3"><td>04·11·26</td><td><a href="https://az.milesplit.com/articles/704755">Phoenix Invitational</a>, Arizona's No. 1 mark</td><td>Long jump</td><td>5.47 m</td><td class="is-gold">Ranked 1st</td></tr>
+            <tr style="--i:4"><td>03·14·26</td><td><a href="https://flashresults.com/2026_Meets/Indoor/03-12_NBIN/701-2_compiled.htm">New Balance Nationals Indoor</a></td><td>60 m</td><td>7.59</td><td>3rd</td></tr>
+            <tr style="--i:5"><td>03·12·26</td><td><a href="https://flashresults.com/2026_Meets/Indoor/03-12_NBIN/723-1_compiled.htm">New Balance Nationals Indoor</a></td><td>Long jump</td><td>5.28 m</td><td>3rd</td></tr>
+            <tr style="--i:6" class="is-title"><td>07·25·25</td><td><a href="https://results.adkinstrak.com/meets/54731/events/individual/2109552">USATF National Junior Olympics</a></td><td>Long jump</td><td>5.17 m</td><td class="is-gold">Champion</td></tr>
+            <tr style="--i:7"><td>06·19·25</td><td><a href="https://live.athletictiming.net/meets/54378/events/individual/2064961">Nike Outdoor Nationals final</a></td><td>100 m</td><td>12.30</td><td>3rd</td></tr>
+            <tr style="--i:8"><td>06·15·25</td><td><a href="https://athleticlive.nyc3.cdn.digitaloceanspaces.com/rawResults/54392/38b6e420220896e12a28a5279c2e067d.htm">Arizona Junior Olympics</a>, meet record</td><td>100 m</td><td>12.27</td><td class="is-gold">1st</td></tr>
+            <tr style="--i:9"><td>04·26·25</td><td><a href="https://athleticlive.nyc3.cdn.digitaloceanspaces.com/rawResults/49652/1a1d19cb1c4a139f43949a8d49a75c37.htm">Pioneer Meet</a>, meet record</td><td>Long jump</td><td>5.22 m</td><td class="is-gold">1st</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="board__note">Full history on <a href="https://www.athletic.net/athlete/16340968/track-and-field/all">Athletic.net</a> and <a href="https://az.milesplit.com/athletes/12776709-l-hopkins">MileSplit</a>. 5.47 m is 17 ft 11.5 in.</p>
+    </div>
+  </section>
+
+  <!-- 4 · FOUR FLIGHTS: the peak. Scroll flies her four official long jumps to scale. -->
+  <section id="flights" class="flights ground-navy" data-sc-act="pin" data-sc-span="3">
+    <div data-sc-stage class="flights__stage" data-flights>
+      <div class="flights__head">
+        <h2 class="display display--light">Four flights</h2>
+        <p class="flights__readout"><span data-flight-meet>Board</span> <strong data-flight-dist>0.00 m</strong></p>
+      </div>
+      <svg class="flights__svg" viewBox="0 0 1200 420" role="img" aria-labelledby="flights-desc">
+        <desc id="flights-desc">Four long jumps by L Hopkins drawn to scale from the takeoff board: 5.22 m at the 2025 Pioneer Meet, 5.17 m to win the 2025 USATF National Junior Olympics, 5.28 m at 2026 New Balance Nationals Indoor, and 5.47 m at the 2026 Phoenix Invitational.</desc>
+        <g class="flights__tape" aria-hidden="true">
+          <line x1="80" y1="360" x2="1150" y2="360" class="flights__ground"/>
+          <rect x="74" y="352" width="12" height="16" class="flights__boardmark"/>
+          <g data-ticks></g>
+        </g>
+        <g data-arcs aria-hidden="true"></g>
+      </svg>
+      <div class="flights__pit" aria-hidden="true">
+        <p class="flights__pit-label">The landing zone, 5.10 to 5.50 m</p>
+        <div class="flights__pit-tape" data-pit></div>
+      </div>
+      <p class="flights__note">Arc shapes are drawn for scale. The landing marks are her official results.</p>
+    </div>
+  </section>
+
+  <!-- 5 · CREW: three uniforms as boarding cards. -->
+  <section id="uniforms" class="crew ground-ivory">
+    <div class="sc-wrap">
+      <h2 class="display crew__h">One passenger, three uniforms</h2>
+      <div class="crew__cards">
+        <article class="card" data-sc-reveal="up" data-sc-reveal-at="0.1 0.45">
+          <div class="card__media" data-sc-tilt="6"><img src="assets/hero-l-900.webp" width="600" height="1611" loading="lazy" alt="L in her Xavier #7 jersey, throwing a football toward the camera."></div>
+          <div class="card__body"><p class="kicker">Seat 7 · Fall</p><h3>The pass rusher</h3><p>Xavier Gators flag football. Twelve sacks and 78 punt-return yards in her first five games of 2026, by the family's count; MaxPreps lists 10 sacks.</p></div>
+        </article>
+        <article class="card card--offset" data-sc-reveal="up" data-sc-reveal-at="0.16 0.5">
+          <div class="card__media" data-sc-tilt="6"><img src="assets/uniform-student-700.webp" width="373" height="1184" loading="lazy" alt="L in her Xavier uniform polo and plaid skirt, backpack on, smiling."></div>
+          <div class="card__body"><p class="kicker">Class of 2030 · All year</p><h3>The student</h3><p>A freshman at Xavier College Preparatory in Phoenix. The track and the field come after the school day, not instead of it.</p></div>
+        </article>
+        <article class="card" data-sc-reveal="up" data-sc-reveal-at="0.22 0.55">
+          <div class="card__media card__media--small" data-sc-tilt="6"><img src="assets/uniform-track-400.webp" width="286" height="531" loading="lazy" alt="L in her club track uniform with a race bib, walking off the track."></div>
+          <div class="card__body"><p class="kicker">Tha Truth Track Tribe · Spring</p><h3>The sprinter</h3><p>Sprints and long jump. Best marks: 12.08 in the 100 m and 5.47 m in the long jump.</p></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · BOARDING PASS: the close holds on the family's door. -->
+  <section id="pass" class="pass ground-navy">
+    <div class="sc-wrap">
+      <div class="pass__ticket" data-sc-in>
+        <div class="pass__main">
+          <p class="kicker pass__label">Boarding pass</p>
+          <h2 class="display display--light">Contact the family</h2>
+          <p class="pass__lede">For coaches, recruiters and sponsors. Your message goes to L's parent, not to her phone.</p>
+          <form class="pass__form" data-contact data-access-key="" method="post" action="#" novalidate>
+            <label>Passenger name<input name="name" autocomplete="name" required placeholder="Your name"></label>
+            <label>Email<input name="email" type="email" autocomplete="email" required placeholder="Your email"></label>
+            <label class="pass__wide">School, club or company <span>(optional)</span><input name="organization" autocomplete="organization" placeholder="School, club or company"></label>
+            <label class="pass__wide">Message<textarea name="message" rows="4" required placeholder="Your message"></textarea></label>
+            <button class="button" type="submit">Send to the family</button>
+            <p class="pass__status" data-contact-status role="status" aria-live="polite"></p>
+          </form>
+        </div>
+        <aside class="pass__stub" aria-label="Pass details">
+          <dl>
+            <div><dt>Passenger</dt><dd>L Hopkins</dd></div>
+            <div><dt>Class</dt><dd>2030</dd></div>
+            <div><dt>Seat</dt><dd>7</dd></div>
+            <div><dt>From</dt><dd>Phoenix</dd></div>
+          </dl>
+          <p>Highlights: <a href="https://www.instagram.com/l.h0pkins/">@l.h0pkins on Instagram</a></p>
+          <p>Support her sports and education: <a href="https://cash.app/$LHopkins7">$LHopkins7 on Cash App</a></p>
+        </aside>
+      </div>
+      <footer class="foot">
+        <p>L Hopkins · Xavier College Preparatory, Class of 2030</p>
+        <p>Photographs are family-owned. Results: Adkins Trak, AthleticLIVE, Athletic.net, Flash Results, MileSplit.</p>
+      </footer>
+    </div>
+  </section>
+
+</main>
+
+<script src="scrollcraft.js"></script>
+<script>ScrollCraft.mount(document.body);</script>
+<script src="site.js"></script>
+<script type="module" src="planet.js"></script>
+</body>
+</html>

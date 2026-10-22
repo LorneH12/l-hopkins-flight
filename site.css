@@ -1,0 +1,228 @@
+/* L Hopkins · Flight log. The Flytrix palette: midnight navy, sand gold, ivory.
+   Navy dominates; gold owns stats and the horizon; ivory is the reading ground. */
+:root {
+  --navy: #19232D;
+  --navy-2: #222E3A;
+  --gold: #DCBB86;
+  --gold-deep: #8A6A36;   /* gold as text on ivory: 4.9:1 */
+  --ivory: #FFFCEF;
+
+  --sc-canvas: var(--navy);
+  --sc-ink: #F4F0E4;
+  --sc-ink-soft: #B7BDC6;
+  --sc-accent: var(--gold);
+  --sc-accent-ink: var(--navy);
+  --sc-font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --sc-font-text: "Mulish", "Segoe UI", system-ui, sans-serif;
+  --sc-r: 14px;
+}
+.ground-navy  { background: var(--navy); --sc-ink: #F4F0E4; --sc-ink-soft: #B7BDC6; --sc-accent: var(--gold); color: var(--sc-ink); }
+.ground-ivory { background: var(--ivory); --sc-ink: #19232D; --sc-ink-soft: #4E5864; --sc-accent: var(--gold-deep); color: var(--sc-ink); }
+
+body { background: var(--navy); }
+p { margin: 0; text-wrap: pretty; }
+h1, h2, h3 { margin: 0; font-weight: 500; }
+.skip { position: fixed; left: 1rem; top: 1rem; z-index: 100; padding: .5rem 1rem; background: var(--gold); color: var(--navy); border-radius: 999px; transform: translateY(-200%); }
+.skip:focus-visible { transform: none; }
+
+.display { font-family: var(--sc-font-display); font-size: clamp(2.4rem, 1.6rem + 3vw, 4.4rem); line-height: 1.04; letter-spacing: -0.015em; text-wrap: balance; }
+.display--light { color: var(--ivory); }
+.kicker { font-size: var(--sc-t-xs); font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--sc-ink-soft); }
+.kicker--gold { color: var(--gold); }
+
+.button {
+  display: inline-flex; align-items: center; min-height: 3rem; padding: 0 1.6rem;
+  background: var(--gold); color: var(--navy); border: 0; border-radius: 999px;
+  font: 700 var(--sc-t-sm)/1 var(--sc-font-text); letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
+  cursor: pointer; white-space: nowrap;
+  transition: background-color var(--sc-d-fast) var(--sc-ease-out), transform 120ms var(--sc-ease-out);
+}
+.button:hover { background: #E8CE9F; }
+.button:active { transform: scale(0.97); }
+.button:disabled { opacity: 0.6; cursor: progress; }
+
+/* ---------------------------------------------------------- route rail */
+.route { position: fixed; right: clamp(0.75rem, 2vw, 1.75rem); top: 12vh; bottom: 12vh; width: 1.5rem; z-index: 60; }
+.route__line { position: absolute; left: 50%; top: 0; height: 100%; width: 2px; transform: translateX(-50%); overflow: visible; }
+.route__line line { stroke: var(--gold); stroke-width: 2; stroke-dasharray: 0.6 1.6; opacity: 0.7; vector-effect: non-scaling-stroke; }
+.route__plane { position: absolute; left: 50%; width: 1.25rem; height: 1.25rem; fill: var(--gold); top: calc(var(--route-p, 0) * 100%); transform: translate(-50%, -50%) rotate(180deg); filter: drop-shadow(0 2px 4px rgb(10 14 20 / .5)); }
+.route ol { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; }
+.route li { position: absolute; left: 50%; top: calc(var(--at) * 100%); transform: translate(-50%, -50%); }
+.route a { display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; text-decoration: none; }
+.route a::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--gold); background: var(--navy); transition: background-color var(--sc-d-fast) var(--sc-ease-out); }
+.route a[aria-current="true"]::before { background: var(--gold); }
+.route a span {
+  position: absolute; right: 2.1rem; white-space: nowrap; padding: .3rem .7rem; border-radius: 999px;
+  background: var(--navy-2); color: var(--ivory); font-size: var(--sc-t-xs); font-weight: 600; letter-spacing: .04em;
+  opacity: 0; transform: translateX(6px); pointer-events: none;
+  transition: opacity 160ms var(--sc-ease-out), transform 160ms var(--sc-ease-out);
+}
+.route a:hover span, .route a:focus-visible span { opacity: 1; transform: none; }
+
+/* -------------------------------------------------------------- takeoff */
+.takeoff__stage { background: radial-gradient(120% 90% at 50% 110%, #2B3A4A 0%, var(--navy) 55%, #121A22 100%); }
+.takeoff__stage > * { position: absolute; }
+.takeoff__sky {
+  inset: 0; opacity: .8;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 28% 42%, #fff 50%, transparent 51%),
+    radial-gradient(1.4px 1.4px at 44% 12%, #F4E3C2 50%, transparent 51%), radial-gradient(1px 1px at 63% 30%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 78% 16%, #fff 50%, transparent 51%), radial-gradient(1.4px 1.4px at 88% 44%, #F4E3C2 50%, transparent 51%),
+    radial-gradient(1px 1px at 8% 52%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 36% 26%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 70% 8%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 94% 26%, #fff 50%, transparent 51%);
+  transform: translate3d(calc(var(--mx, 0) * -6px), calc(var(--sc-p, 0) * 3vh), 0);
+}
+.takeoff__copy {
+  top: 13vh; left: 50%; width: min(46rem, 88vw); transform: translate3d(-50%, calc(var(--sc-p, 0) * -8vh), 0);
+  display: grid; justify-items: center; gap: 1.1rem; text-align: center; z-index: 3;
+}
+.takeoff__kicker { font-size: var(--sc-t-xs); font-weight: 700; letter-spacing: .38em; text-transform: uppercase; color: var(--gold); }
+.takeoff__title { font-family: var(--sc-font-display); font-weight: 500; font-size: clamp(3.4rem, 1.5rem + 8vw, 8.5rem); line-height: .95; letter-spacing: 0.02em; color: var(--ivory); }
+.takeoff__line { max-width: 34ch; color: var(--sc-ink-soft); font-size: var(--sc-t-base); }
+/* L stands behind the horizon and rises over it. */
+.takeoff__l {
+  left: 50%; bottom: 0; height: 62vh; width: auto; max-width: none; z-index: 1;
+  transform: translate3d(calc(-50% + var(--mx, 0) * 10px), calc((1 - var(--sc-p, 0)) * 16vh), 0);
+  filter: drop-shadow(0 -2px 18px rgb(220 187 134 / .18));
+}
+.takeoff__poster {
+  left: 50%; bottom: -100vw; width: 120vw; aspect-ratio: 1; border-radius: 50%; transform: translateX(-50%); z-index: 2;
+  background: radial-gradient(circle at 50% 8%, #EBD3A6 0%, var(--gold) 30%, #B8955C 70%);
+  transition: opacity 400ms var(--sc-ease-out);
+}
+.takeoff__planet { inset: 0; width: 100%; height: 100%; z-index: 2; opacity: 0; transition: opacity 500ms var(--sc-ease-out); }
+.takeoff.is-3d .takeoff__planet { opacity: 1; }
+.takeoff.is-3d .takeoff__poster { opacity: 0; }
+
+/* ------------------------------------------------------------- the log */
+.log { padding-block: clamp(5rem, 10vw, 9rem); }
+.log__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(3rem, 7vw, 7rem); align-items: center; }
+.log__media { position: relative; padding: 0 0 4rem 3rem; }
+.log__block { position: absolute; left: 0; top: 12%; bottom: 0; width: 70%; background: var(--navy); border-radius: var(--sc-r); }
+.log__photo { position: relative; margin: 0; border-radius: var(--sc-r); overflow: hidden; box-shadow: var(--sc-e3); }
+.log__photo img { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 20%; }
+.log__stat { position: absolute; right: -1.5rem; bottom: 0; width: min(16rem, 62%); padding: 1.4rem; background: var(--gold); color: var(--navy); border-radius: var(--sc-r); box-shadow: var(--sc-e2); }
+.log__stat-n { font-family: var(--sc-font-display); font-size: clamp(2.2rem, 1.6rem + 1.6vw, 3.2rem); line-height: 1; margin-bottom: .5rem; }
+.log__stat p:last-child { font-size: var(--sc-t-sm); line-height: 1.5; }
+.log__text { max-width: 36rem; }
+.log__text > p:not(.kicker) { font-size: var(--sc-t-base); }
+
+/* ------------------------------------------------------ departures board */
+.board { padding-block: clamp(5rem, 9vw, 8rem); }
+.board__head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem 3rem; margin-bottom: 2.5rem; }
+.board__head p { color: var(--sc-ink-soft); }
+.board__scroll { overflow-x: auto; padding: 1rem; margin-inline: -1rem; }
+.board__table { width: 100%; min-width: 46rem; border-collapse: separate; border-spacing: 0 6px; font-size: var(--sc-t-sm); }
+.board__table thead th { text-align: left; padding: 0 1rem .4rem; font-size: var(--sc-t-xs); font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
+.board__table td { padding: .85rem 1rem; background: #0F161D; color: #F4F0E4; font-variant-numeric: tabular-nums; border-block: 1px solid #2A3644; }
+.board__table td:first-child { border-left: 1px solid #2A3644; border-radius: 8px 0 0 8px; font-weight: 700; letter-spacing: .06em; color: var(--sc-ink-soft); }
+.board__table td:last-child { border-right: 1px solid #2A3644; border-radius: 0 8px 8px 0; }
+.board__table td:nth-child(4) { font-family: var(--sc-font-display); font-size: var(--sc-t-lg); white-space: nowrap; }
+.board__table td.is-gold { color: var(--gold); font-weight: 700; }
+.board__table tr.is-title td { background: #1E2A20; background: color-mix(in oklab, var(--gold) 16%, #0F161D); }
+.board__table a { color: inherit; text-decoration-color: color-mix(in oklab, var(--gold) 60%, transparent); }
+.board__table a:hover { color: var(--gold); }
+.board__note { margin-top: 1.5rem; font-size: var(--sc-t-sm); color: var(--sc-ink-soft); }
+.board__note a { color: var(--ivory); }
+/* Split-flap arrival: each cell flips down once, row by row. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-board] td { transform-origin: 50% 0; transform: perspective(400px) rotateX(-88deg); opacity: 0; }
+  [data-board].is-in td { animation: flap 520ms var(--sc-ease-out) forwards; animation-delay: calc(var(--i) * 70ms); }
+}
+@keyframes flap { 60% { transform: perspective(400px) rotateX(12deg); opacity: 1; } to { transform: none; opacity: 1; } }
+
+/* --------------------------------------------------------- four flights */
+.flights__stage { background: var(--navy); display: grid; grid-template-rows: auto 1fr auto auto; align-content: center; gap: 1rem; padding: 9vh clamp(1.25rem, 5vw, 5.5rem) 5vh calc(clamp(1.25rem, 5vw, 5.5rem)); padding-right: calc(clamp(1.25rem, 5vw, 5.5rem) + 2rem); }
+.flights__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 1rem 3rem; }
+.flights__readout { display: grid; justify-items: end; color: var(--sc-ink-soft); font-size: var(--sc-t-sm); letter-spacing: .04em; min-width: 16rem; }
+.flights__readout strong { font-family: var(--sc-font-display); font-weight: 500; font-size: clamp(2.6rem, 1.8rem + 3vw, 4.8rem); line-height: 1; color: var(--gold); font-variant-numeric: tabular-nums; }
+.flights__svg { width: 100%; height: 100%; max-height: 46vh; overflow: visible; }
+.flights__ground { stroke: #3A4858; stroke-width: 2; }
+.flights__boardmark { fill: var(--ivory); }
+.flights__svg .tick { stroke: #4A5868; stroke-width: 1.5; }
+.flights__svg .tick-label { fill: #8D97A3; font: 600 13px var(--sc-font-text); }
+.flights__svg .arc { fill: none; stroke: var(--gold); stroke-width: 2.5; stroke-dasharray: 6 7; stroke-linecap: round; opacity: .45; }
+.flights__svg .arc.is-live { opacity: 1; stroke-width: 3; }
+.flights__svg .arc.is-title { stroke: #F1D8A8; }
+.flights__svg .dot { fill: var(--ivory); }
+.flights__pit { display: grid; gap: .6rem; }
+.flights__pit-label { font-size: var(--sc-t-xs); letter-spacing: .2em; text-transform: uppercase; color: var(--sc-ink-soft); font-weight: 700; }
+.flights__pit-tape { position: relative; height: 4.6rem; border-radius: 10px; background: linear-gradient(#C9A974, #B8955C); overflow: hidden; }
+.flights__pit-tape .mark { position: absolute; top: 0; bottom: 0; left: calc(var(--x) * 100%); width: 0; opacity: 0; transition: opacity 220ms var(--sc-ease-out); }
+.flights__pit-tape .mark::before { content: ""; position: absolute; top: .6rem; bottom: .6rem; left: -1px; width: 2px; background: var(--navy); }
+.flights__pit-tape .mark span { position: absolute; top: .55rem; left: .5rem; white-space: nowrap; color: var(--navy); font-size: var(--sc-t-xs); font-weight: 700; line-height: 1.25; }
+.flights__pit-tape .mark.is-low span { top: auto; bottom: .55rem; }
+.flights__pit-tape .mark.is-on { opacity: 1; }
+.flights__pit-tape .scale { position: absolute; left: calc(var(--x) * 100%); bottom: 0; height: .5rem; width: 1px; background: rgb(25 35 45 / .45); }
+.flights__note { font-size: var(--sc-t-xs); color: var(--sc-ink-soft); }
+
+/* ----------------------------------------------------------------- crew */
+.crew { padding-block: clamp(5rem, 10vw, 9rem); }
+.crew__h { max-width: 16ch; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+.crew__cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.25rem, 3vw, 2.5rem); align-items: start; }
+.card { background: #fff; border-radius: var(--sc-r); box-shadow: var(--sc-e2); overflow: hidden; }
+.card--offset { margin-top: 4rem; }
+.card__media { height: clamp(18rem, 34vw, 26rem); background: var(--navy); display: flex; align-items: flex-end; justify-content: center; padding-top: 1.5rem; border-bottom: 4px solid var(--gold); }
+.card__media img { height: 100%; width: auto; max-width: 92%; object-fit: contain; }
+.card__media--small img { height: 80%; }
+.card__body { padding: 1.4rem 1.4rem 1.6rem; display: grid; gap: .5rem; }
+.card__body .kicker { color: var(--gold-deep); }
+.card h3 { font-family: var(--sc-font-display); font-size: var(--sc-t-xl); line-height: 1.1; }
+.card__body p:last-child { font-size: var(--sc-t-sm); color: var(--sc-ink-soft); }
+
+/* ------------------------------------------------------- boarding pass */
+.pass { padding-block: clamp(5rem, 9vw, 8rem) 2.5rem; }
+.pass__ticket { display: grid; grid-template-columns: minmax(0, 1fr) 19rem; background: var(--ivory); color: #19232D; border-radius: 22px; box-shadow: var(--sc-e3); overflow: hidden; --sc-ink-soft: #4E5864; }
+.pass__main { padding: clamp(1.75rem, 4vw, 3.25rem); display: grid; gap: 1rem; }
+.pass__main .display--light { color: var(--navy); }
+.pass__lede { max-width: 44ch; color: #4E5864; }
+.pass__form { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem 1.5rem; margin-top: .75rem; }
+.pass__form label { display: grid; gap: .35rem; font-size: var(--sc-t-xs); font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #4E5864; }
+.pass__form label span { font-weight: 600; letter-spacing: .04em; text-transform: none; }
+.pass__wide { grid-column: 1 / -1; }
+.pass__form input, .pass__form textarea { width: 100%; padding: .75rem .9rem; border: 1px solid #C8C2AE; border-radius: 10px; background: #fff; color: #19232D; font: 500 var(--sc-t-base) var(--sc-font-text); letter-spacing: 0; text-transform: none; transition: border-color var(--sc-d-fast) var(--sc-ease-out); }
+.pass__form input:focus-visible, .pass__form textarea:focus-visible { outline: 2px solid var(--gold-deep); outline-offset: 1px; border-color: var(--gold-deep); }
+.pass__form textarea { resize: vertical; }
+.pass__form .button { justify-self: start; background: var(--navy); color: var(--ivory); }
+.pass__form .button:hover { background: #2A3846; }
+.pass__status { grid-column: 1 / -1; min-height: 1.5em; font-size: var(--sc-t-sm); color: #4E5864; }
+.pass__stub { position: relative; padding: clamp(1.75rem, 4vw, 3rem) 1.75rem; background: var(--gold); color: var(--navy); display: grid; align-content: start; gap: 1.25rem; border-left: 2px dashed rgb(25 35 45 / .35); }
+.pass__stub dl { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.pass__stub dt { font-size: var(--sc-t-xs); font-weight: 700; letter-spacing: .16em; text-transform: uppercase; opacity: .75; }
+.pass__stub dd { margin: 0; font-family: var(--sc-font-display); font-size: var(--sc-t-lg); line-height: 1.15; overflow-wrap: anywhere; }
+.pass__stub p { font-size: var(--sc-t-sm); line-height: 1.5; }
+.pass__stub a { color: var(--navy); font-weight: 700; }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .75rem 2rem; margin-top: 3rem; font-size: var(--sc-t-xs); color: var(--sc-ink-soft); }
+
+/* --------------------------------------------------------------- phones */
+@media (max-width: 860px) {
+  .route { top: auto; bottom: 0; right: 0; left: 0; width: auto; height: 2.75rem; background: rgb(25 35 45 / .92); backdrop-filter: blur(6px); padding-bottom: env(safe-area-inset-bottom, 0); }
+  .route__line { left: 1.5rem; right: 1.5rem; top: 50%; width: auto; height: 2px; transform: translateY(-50%); }
+  .route__line { display: none; }
+  .route__plane { top: 50%; left: calc(1.5rem + var(--route-p, 0) * (100% - 3rem)); transform: translate(-50%, -50%) rotate(90deg); }
+  .route ol { left: 1.5rem; right: 1.5rem; }
+  .route li { top: 50%; left: calc(var(--at) * 100%); }
+  .route a span { display: none; }
+  .route::before { content: ""; position: absolute; left: 1.5rem; right: 1.5rem; top: 50%; border-top: 2px dotted rgb(220 187 134 / .7); }
+  .takeoff__copy { top: 9vh; gap: .8rem; }
+  .takeoff__line { font-size: var(--sc-t-sm); }
+  .takeoff__l { height: 56vh; }
+  .takeoff__poster { width: 190vw; bottom: -150vw; }
+  .log__grid { grid-template-columns: 1fr; }
+  .log__media { margin-right: 1.5rem; }
+  .flights__stage { padding: 8vh 1.25rem 6vh; gap: .75rem; }
+  .flights__readout { justify-items: start; min-width: 0; }
+  .crew__cards { grid-template-columns: 1fr; }
+  .card--offset { margin-top: 0; }
+  .pass__ticket { grid-template-columns: 1fr; }
+  .pass__stub { border-left: 0; border-top: 2px dashed rgb(25 35 45 / .35); }
+  .pass__form { grid-template-columns: 1fr; }
+  .pass { padding-bottom: 4.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .takeoff__l { transform: translate3d(-50%, 10vh, 0); }
+  .takeoff__copy, .takeoff__sky { transform: translateX(-50%); }
+  .takeoff__sky { transform: none; }
+}
+.pass__label { color: var(--gold-deep); }
