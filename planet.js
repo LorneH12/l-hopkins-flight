@@ -1,4 +1,4 @@
-// The takeoff horizon: a real 3D planet limb in the deck's sand gold, with a
+// The takeoff horizon: a real 3D planet limb in Xavier gold, with a
 // navigational graticule and an orbit of small beacons (the deck's ring dots).
 // Its limb is solved to sit on the CSS horizon (--horizon, --lx on the stage),
 // so L always stands on it, never behind it. Scroll turns it; the pointer
@@ -28,13 +28,13 @@ if (!reduce && webgl()) {
 
   const globe = new THREE.Mesh(
     new THREE.SphereGeometry(R, 128, 96),
-    new THREE.MeshStandardMaterial({ color: 0xdcbb86, roughness: 0.82, metalness: 0.12 })
+    new THREE.MeshStandardMaterial({ color: 0xe7b744, roughness: 0.82, metalness: 0.12 })
   );
   planet.add(globe);
 
   // Graticule: meridians and parallels, a hair above the surface.
   const grid = new THREE.Group();
-  const lineMat = new THREE.LineBasicMaterial({ color: 0x8a6a36, transparent: true, opacity: 0.35 });
+  const lineMat = new THREE.LineBasicMaterial({ color: 0xb8891e, transparent: true, opacity: 0.35 });
   for (let i = 0; i < 18; i++) {
     const pts = [];
     for (let j = 0; j <= 96; j++) {
@@ -56,7 +56,7 @@ if (!reduce && webgl()) {
   // Orbit of beacons, tilted, like the deck's scattered ring dots.
   const orbit = new THREE.Group();
   const beaconGeo = new THREE.SphereGeometry(0.05, 12, 8);
-  const beaconMat = new THREE.MeshBasicMaterial({ color: 0xffeccb });
+  const beaconMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
   for (let i = 0; i < 9; i++) {
     const a = (i / 9) * Math.PI * 2, b = new THREE.Mesh(beaconGeo, beaconMat);
     b.position.set(Math.cos(a) * R * 1.35, 0, Math.sin(a) * R * 1.35); orbit.add(b);
@@ -64,10 +64,10 @@ if (!reduce && webgl()) {
   orbit.rotation.x = 0.32; orbit.rotation.z = -0.12;
   planet.add(orbit);
 
-  scene.add(new THREE.HemisphereLight(0xfff1d6, 0x19232d, 0.9));
+  scene.add(new THREE.HemisphereLight(0xfff6e0, 0x083350, 0.9));
   const sun = new THREE.DirectionalLight(0xfff4e0, 2.4);
   sun.position.set(-4, 7, 6); scene.add(sun);
-  const rim = new THREE.DirectionalLight(0x9fb4d0, 0.9);
+  const rim = new THREE.DirectionalLight(0x518db7, 0.9);
   rim.position.set(5, 1, -6); scene.add(rim);
 
   const CAM_Y = 0.2, CAM_Z = 9, PLANET_Z = -2;
