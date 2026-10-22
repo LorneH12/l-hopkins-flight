@@ -71,13 +71,22 @@
   var meetEl = document.querySelector('[data-flight-meet]');
   var distEl = document.querySelector('[data-flight-dist]');
   var PIT_MIN = 5.10, PIT_MAX = 5.50;
+  // Phones get a taller drawing: same 0-6 m tape, more height for the arcs.
+  var TALL = matchMedia('(max-width: 860px)').matches, LIFT = 2;
+  if (TALL) {
+    var svgEl = document.querySelector('.flights__svg');
+    GROUND = 820; LIFT = 3.6;
+    svgEl.setAttribute('viewBox', '0 0 1200 900');
+    var gl = svgEl.querySelector('.flights__ground'); gl.setAttribute('y1', GROUND); gl.setAttribute('y2', GROUND);
+    svgEl.querySelector('.flights__boardmark').setAttribute('y', GROUND - 8);
+  }
 
   for (var m = 0; m <= 6; m++) {
     var x = BOARD_X + m * PER_M;
     var t = document.createElementNS(SVGNS, 'line');
     t.setAttribute('class', 'tick'); t.setAttribute('x1', x); t.setAttribute('x2', x); t.setAttribute('y1', GROUND); t.setAttribute('y2', GROUND + 10);
     var lab = document.createElementNS(SVGNS, 'text');
-    lab.setAttribute('class', 'tick-label'); lab.setAttribute('x', x); lab.setAttribute('y', GROUND + 32); lab.setAttribute('text-anchor', 'middle');
+    lab.setAttribute('class', 'tick-label'); lab.setAttribute('x', x); lab.setAttribute('y', GROUND + (TALL ? 64 : 32)); lab.setAttribute('text-anchor', 'middle');
     lab.textContent = m + ' m';
     ticksG.appendChild(t); ticksG.appendChild(lab);
   }
@@ -87,10 +96,10 @@
   FLIGHTS.forEach(function (f, i) {
     var end = BOARD_X + f.d * PER_M, apex = 150 + i * 14; // illustrative heights, drawn for scale only
     var path = document.createElementNS(SVGNS, 'path');
-    path.setAttribute('d', 'M' + BOARD_X + ' ' + GROUND + ' Q ' + ((BOARD_X + end) / 2) + ' ' + (GROUND - apex * 2) + ' ' + end + ' ' + GROUND);
+    path.setAttribute('d', 'M' + BOARD_X + ' ' + GROUND + ' Q ' + ((BOARD_X + end) / 2) + ' ' + (GROUND - apex * LIFT) + ' ' + end + ' ' + GROUND);
     path.setAttribute('class', 'arc' + (f.title ? ' is-title' : '') + (f.best ? ' is-best' : ''));
     var dot = document.createElementNS(SVGNS, 'circle');
-    dot.setAttribute('r', 6); dot.setAttribute('class', 'dot'); dot.style.opacity = 0;
+    dot.setAttribute('r', TALL ? 16 : 6); dot.setAttribute('class', 'dot'); dot.style.opacity = 0;
     arcsG.appendChild(path); arcsG.appendChild(dot);
     f.path = path; f.dot = dot; f.len = path.getTotalLength();
     path.style.strokeDasharray = f.len; path.style.strokeDashoffset = f.len;
@@ -102,7 +111,7 @@
     pit.appendChild(mark); f.mark = mark;
   });
 
-  // Silence for the first 14% of the act, then four windows, then a hold.
+  // A breath at the start, then four windows, then a hold.
   var START = 0.04, WIN = 0.19;
   var lastKey = '';
   function updateFlights() {
@@ -154,8 +163,9 @@
     titleEl.textContent = b.dataset.title; metaEl.textContent = b.dataset.meta;
     if (play) { var pr = video.play(); if (pr && pr.catch) pr.catch(function () {}); }
   }
-  chapters.forEach(function (b, i) { b.addEventListener('click', function () { choose(i, true); }); });
-  video.addEventListener('ended', function () { if (inView && !saveData) choose((current + 1) % chapters.length, true); });
+  var picked = false;
+  chapters.forEach(function (b, i) { b.addEventListener('click', function () { picked = true; choose(i, true); }); });
+  video.addEventListener('ended', function () { if (inView && !saveData && !picked) choose((current + 1) % chapters.length, true); });
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
@@ -203,7 +213,14 @@
   form.addEventListener('input', function (e) {
     if (e.target.getAttribute('aria-invalid')) { e.target.removeAttribute('aria-invalid'); e.target.removeAttribute('aria-describedby'); }
   });
-  if (!form.getAttribute('data-access-key')) document.querySelector('[data-contact-offline]').hidden = false;
+  // Until the relay key is set, say so and switch the form off so nobody writes into a dead end.
+  if (!form.getAttribute('data-access-key')) {
+    document.querySelector('[data-contact-offline]').hidden = false;
+    form.classList.add('is-offline');
+    [].forEach.call(form.querySelectorAll('input, textarea, button'), function (el) { el.disabled = true; });
+    form.querySelector('button[type=submit]').textContent = 'Opens soon';
+    [].forEach.call(form.querySelectorAll('input, textarea'), function (el) { el.setAttribute('aria-describedby', 'contact-offline'); });
+  }
   form.addEventListener('submit', function (event) {
     event.preventDefault();
     var missing = [].slice.call(form.querySelectorAll('[required]')).find(function (f) { return !f.value.trim(); });
@@ -211,7 +228,7 @@
     var email = form.querySelector('[type=email]');
     if (!email.validity.valid || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim())) { flag(email, 'That email address looks incomplete. Check it and send again.'); return; }
     var key = form.getAttribute('data-access-key');
-    if (!key) { status.textContent = 'The form is not sending yet. Your message is still here; for now, reach the family on Instagram at @l.h0pkins.'; return; }
+    if (!key) { status.textContent = 'The form is not connected yet. It opens soon.'; return; }
     var data = new FormData(form);
     data.append('access_key', key);
     data.append('subject', 'L Hopkins site: message from ' + data.get('name'));
